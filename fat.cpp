@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "fat.h"
 
 FAT::FAT(Superblock sb, FILE *fp) {

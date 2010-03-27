@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "superblock.h"
 
 Superblock::Superblock(FILE *fp) {
