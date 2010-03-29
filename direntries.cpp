@@ -26,10 +26,14 @@ void DirEntries::print() {
 			cout << "D ";
 
 		cout << setw(10) << file_size;
-		cout << setw(30) << file_name << endl;
-		/* #if DEBUG */
-		/* cout << create_time; */
-		/* #endif */
-		/* cout << modify_time; */
+		cout << setw(30) << file_name;
+		unsigned short int year;
+		unsigned char month;
+		unsigned char day;
+		unsigned char hour;
+		unsigned char minute;
+		unsigned char second;
+		memcpy(&year, &create_time, 2);
+		fprintf(stdout, "%d", htons(year));
 	}
 }

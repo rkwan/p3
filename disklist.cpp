@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <netinet/in.h>
-#include "fat.h"
 #include "superblock.h"
+#include "direntries.h"
 
 using namespace std;
 
@@ -16,6 +16,9 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Error: failed to open file\n");
 		exit(1);
 	}
-
+	Superblock sb (fp);
+	fseek(fp, sb.rootStart()*sb.blockSize(), SEEK_SET);
+	DirEntries dir (fp);
+	dir.print();
 	return 0;
 }
