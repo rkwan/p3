@@ -1,0 +1,6 @@
+To build the program, run 'make'. This creates four executables: diskinfo, disklist, diskget, and diskput.
+
+diskinfo <input image>
+disklist <input image>
+diskget <input image> <output file>
+diskput <disk image> <input file>
