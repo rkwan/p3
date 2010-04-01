@@ -19,7 +19,8 @@ class DirEntries {
 		char file_name[31];
 		unsigned char unused[6]; // may not be necessary
 	public:
-		DirEntries(FILE *);
+		DirEntries();
+		void getEntry(FILE *);
 		void print();
 		unsigned char status() {return _status;}
 		unsigned int startingBlock(){return starting_block;}

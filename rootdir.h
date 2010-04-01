@@ -2,10 +2,13 @@
 #define ROOTDIR_H
 
 #include <iostream>
+#include <cstdlib>
+#include <cstring>
 #include <new>
-#include <stdlib.h>
+#include <netinet/in.h>
 #include "superblock.h"
 #include "direntries.h"
+#include "fat.h"
 
 using namespace std;
 
@@ -13,10 +16,13 @@ class RootDir {
 	private:
 		unsigned int start;
 		unsigned int blocks;
-		unsigned int entries;
+		int entries;
 		DirEntries *root;
+
 	public:
 		RootDir(FILE *, Superblock);
+		int fileExists(char *);
+		void getFile(FILE *, Superblock, char *);
 		void closeDir();
 		void print();
 };
