@@ -19,10 +19,10 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	Superblock sb(fp);
-	FAT filealloctable(sb, fp);
-	/* might have to change the parameters so it is consistant. */
+
 	RootDir root(fp, sb); 
 	root.getFile(fp, sb, argv[2]);
-	/* cout << root.fileExists(argv[2]) << endl; */
+	root.closeDir();
+	fclose(fp);
 	return 0;
 }

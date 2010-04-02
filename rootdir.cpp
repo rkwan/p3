@@ -85,6 +85,7 @@ void RootDir::getFile(FILE *fp, Superblock sb, char *fname) {
 		fwrite(&block_buffer, root[index].fileSize() % bs, 1, outfp);
 
 	}
+	fclose(outfp);
 }
 
 void RootDir::closeDir() {
