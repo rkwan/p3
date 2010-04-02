@@ -34,4 +34,4 @@ rootdir.o: rootdir.cpp rootdir.h direntries.o direntries.h fat.o fat.h
 	$(CC) $(CFLAGS) -c rootdir.cpp
 
 clean:
-	rm -rf *.o diskinfo disklist diskget
+	rm -rf *.o diskinfo disklist diskget mkfile.cc foo.txt disk.img.gz

@@ -12,14 +12,14 @@ class FAT {
         unsigned int free_blocks;
         unsigned int reserved_blocks;
         unsigned int allocated_blocks;
-        unsigned int used_blocks;
+        unsigned int last_blocks;
     public:
         FAT(Superblock, FILE *);
         void print();
         unsigned int freeBlocks() {return free_blocks;}
         unsigned int reservedBlocks() {return reserved_blocks;}
         unsigned int allocatedBlocks() {return allocated_blocks;}
-        unsigned int usedBlocks() {return used_blocks;}
+        unsigned int lastBlocks() {return last_blocks;}
 };
 
 #endif

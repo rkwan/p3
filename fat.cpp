@@ -6,7 +6,7 @@ FAT::FAT(Superblock sb, FILE *fp) {
 	free_blocks = 0;
 	reserved_blocks = 0;
 	allocated_blocks = 0;
-	used_blocks = 0;
+	last_blocks = 0;
 
 	fseek(fp, sb.fatStart()*sb.blockSize(), SEEK_SET);
 	for (i = 0; i < sb.fatBlocks()*(sb.blockSize()/4); i++) {
@@ -17,9 +17,9 @@ FAT::FAT(Superblock sb, FILE *fp) {
 		else if (buffer == 0x00000001)
 			reserved_blocks++;
 		else if (buffer == 0xffffffff)
-			allocated_blocks++;
+			last_blocks++;
 		else
-			used_blocks++;
+			allocated_blocks++;
 	}
 }
 
@@ -29,6 +29,6 @@ void FAT::print() {
 	cout << "Reserved Blocks: " << reserved_blocks << endl;
 	cout << "Allocated Blocks: " << allocated_blocks << endl;
 #if DEBUG
-	cout << "Used Blocks: " << used_blocks << endl; // Remember to remove this before submitting.
+	cout << "Last Blocks: " << last_blocks << endl; // Remember to remove this before submitting.
 #endif
 }

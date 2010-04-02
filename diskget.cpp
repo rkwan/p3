@@ -14,13 +14,8 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	FILE *fp;
-	FILE *outfp;
 	if ((fp = fopen(argv[1], "r")) == NULL) {
 		cerr << "Error: failed to open file: " << argv[1];
-		exit(1);
-	}
-	if ((outfp = fopen(argv[2], "w")) == NULL) {
-		cerr << "Error: failed to open file: " << argv[2];
 		exit(1);
 	}
 	Superblock sb(fp);
