@@ -41,7 +41,7 @@ class DirEntries {
 		void setFilesize(unsigned int, int, Superblock *);
 		void setCreateTime(unsigned char [8], int, Superblock *);
 		void setModifyTime(int, Superblock *);
-		void setFilename(char [31], int, Superblock *);
+		void setFilename(char *, int, Superblock *);
 };
 
 #endif

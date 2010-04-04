@@ -145,3 +145,10 @@ void DirEntries::setModifyTime(int index, Superblock *sb) {
 	fwrite(&minute ,1, 1, fptr);
 	fwrite(&second, 1, 1, fptr);
 }
+
+void DirEntries::setFilename(char *fname, int index, Superblock *sb) {
+	strncpy(file_name, fname, 31);
+	int offset = 27;
+	fseek(fptr, offset + sb->blockSize()*sb->rootStart() + index*64, SEEK_SET);
+	fwrite(fname, 30, 1, fptr);
+}

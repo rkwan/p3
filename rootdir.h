@@ -22,12 +22,12 @@ class RootDir {
 
 		int availableFAT(FILE *, Superblock);
 		int availableEntry();
-		void updateFDT(Superblock, int, char);
+		void updateFDT(Superblock, int, char, char *);
 	public:
 		RootDir(FILE *, Superblock);
 		int fileExists(char *);
 		void getFile(FILE *, Superblock, char *);
-		void putFile(FILE *, FILE *, Superblock);
+		void putFile(FILE *, char *, Superblock);
 		void closeDir();
 		void print();
 };

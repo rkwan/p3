@@ -63,16 +63,23 @@ int RootDir::availableFAT(FILE *fp, Superblock sb) {
 	return -1;	
 }
 
-void RootDir::updateFDT(Superblock sb, int index, char s) {
+void RootDir::updateFDT(Superblock sb, int index, char s, char *fname) {
 	root[index].setStatus(s, index, &sb);
 	// FIXME
 	root[index].setStartingBlock(80, index, &sb);
 	root[index].setBlockCount(1, index, &sb);
 	root[index].setFilesize(300, index, &sb);
 	root[index].setModifyTime(index, &sb);	
+	root[index].setFilename(fname,index, &sb);
 }
 
-void RootDir::putFile(FILE *fsfp, FILE *srcfile, Superblock sb) {
+void RootDir::putFile(FILE *fsfp, char *srcfname, Superblock sb) {
+	FILE *srcfp;
+
+	if ((srcfp = fopen(srcfname, "r")) == NULL) {
+		cerr << "File not found." << endl;
+		exit(1);
+	}
 	int i;
 	int j;
 	if ((i = availableEntry()) < 0) {
@@ -89,7 +96,8 @@ void RootDir::putFile(FILE *fsfp, FILE *srcfile, Superblock sb) {
 #if DEBUG
 	cout << j << endl;
 #endif
-	updateFDT(sb, i, 3);
+	updateFDT(sb, i, 3, srcfname);
+	fclose(srcfp);
 }
 
 void RootDir::getFile(FILE *fp, Superblock sb, char *fname) {
