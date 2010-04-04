@@ -19,7 +19,7 @@ RootDir::RootDir(FILE *fp, Superblock sb) {
 			cerr << "seek failed";
 			exit(1);
 		}
-		root[i].getEntry(fp);
+		root[i].getEntry(fp, sb);
 	}
 }
 
@@ -31,6 +31,65 @@ int RootDir::fileExists(char *fname) {
 		i++;
 	}
 	return -1;
+}
+
+int RootDir::availableEntry() {
+	int i = 0;
+	while (i < entries) {
+		if (root[i].status() == 0x00)
+			return i;
+		i++;
+	}
+	return -1;
+}
+
+int RootDir::availableFAT(FILE *fp, Superblock sb) {
+	/* probably more efficient if I have I as a global variable. */
+	int i = 0;
+	unsigned int buffer;
+
+	int bs = sb.blockSize();
+	int s = sb.fatStart();
+	int b = sb.fatBlocks();
+
+	fseek(fp, s * bs, SEEK_SET);
+	while (i < b*(bs/4)) {
+		fread(&buffer, sizeof(unsigned int), 1, fp);
+		buffer = htonl(buffer);
+		if (buffer == 0x00000000)
+			return i;
+		i++;
+	}
+	return -1;	
+}
+
+void RootDir::updateFDT(Superblock sb, int index, char s) {
+	root[index].setStatus(s, index, &sb);
+	// FIXME
+	root[index].setStartingBlock(80, index, &sb);
+	root[index].setBlockCount(1, index, &sb);
+	root[index].setFilesize(300, index, &sb);
+	root[index].setModifyTime(index, &sb);	
+}
+
+void RootDir::putFile(FILE *fsfp, FILE *srcfile, Superblock sb) {
+	int i;
+	int j;
+	if ((i = availableEntry()) < 0) {
+		cout << "No more directory entries available." << endl;
+		return;
+	}
+#if DEBUG
+	cout << i << endl;
+#endif
+	if ((j = availableFAT(fsfp, sb)) < 0) {
+		cout << "Not more FAT entires available." << endl;
+		return;
+	}
+#if DEBUG
+	cout << j << endl;
+#endif
+	updateFDT(sb, i, 3);
 }
 
 void RootDir::getFile(FILE *fp, Superblock sb, char *fname) {
@@ -98,3 +157,4 @@ void RootDir::print() {
 		root[i].print();
 	}
 }
+
