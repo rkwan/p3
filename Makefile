@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -g
+CFLAGS=-Wall
 
 all: diskinfo disklist diskget diskput
 
@@ -40,4 +40,4 @@ rootdir.o: rootdir.cpp rootdir.h direntries.o direntries.h fat.o fat.h
 	$(CC) $(CFLAGS) -c rootdir.cpp
 
 clean:
-	rm -rf *.o diskinfo disklist diskget mkfile.cc foo.txt disk.img.gz
+	rm -rf *.o diskinfo disklist diskget diskput mkfile.cc foo.txt disk.img.gz

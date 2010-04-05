@@ -22,7 +22,8 @@ class RootDir {
 
 		int availableFAT(FILE *, Superblock);
 		int availableEntry();
-		void updateFDT(Superblock, int, char, char *);
+		int findNextAvailableFat(FILE *, Superblock *, int);
+		void updateFDT(Superblock, int, char, int, int, int, char *);
 	public:
 		RootDir(FILE *, Superblock);
 		int fileExists(char *);

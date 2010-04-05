@@ -63,40 +63,96 @@ int RootDir::availableFAT(FILE *fp, Superblock sb) {
 	return -1;	
 }
 
-void RootDir::updateFDT(Superblock sb, int index, char s, char *fname) {
+void RootDir::updateFDT(Superblock sb, int index, char s, int fb, int bc, int fs, char *fname) {
 	root[index].setStatus(s, index, &sb);
-	// FIXME
-	root[index].setStartingBlock(80, index, &sb);
-	root[index].setBlockCount(1, index, &sb);
-	root[index].setFilesize(300, index, &sb);
-	root[index].setModifyTime(index, &sb);	
+	root[index].setStartingBlock(fb, index, &sb);
+	root[index].setBlockCount(bc, index, &sb);
+	root[index].setFilesize(fs, index, &sb);
+	root[index].setModifyTime(index, &sb);
 	root[index].setFilename(fname,index, &sb);
+}
+
+int RootDir::findNextAvailableFat(FILE *fp, Superblock *sb, int startAt) {
+	unsigned int buffer;
+	int s = startAt;
+	fseek(fp, sb->fatStart()*sb->blockSize() + (startAt+1)*4, SEEK_SET);
+	startAt++;
+	fread(&buffer, sizeof(unsigned int), 1, fp);
+	while (buffer != 0x00000000) {
+		startAt++;
+		fread(&buffer, sizeof(unsigned int), 1, fp);
+	}
+	/* undoing the side effect. */
+	fseek(fp, sb->fatStart()*sb->blockSize() + s*4, SEEK_SET);
+	return startAt;
 }
 
 void RootDir::putFile(FILE *fsfp, char *srcfname, Superblock sb) {
 	FILE *srcfp;
-
 	if ((srcfp = fopen(srcfname, "r")) == NULL) {
 		cerr << "File not found." << endl;
 		exit(1);
 	}
-	int i;
-	int j;
-	if ((i = availableEntry()) < 0) {
+
+	int index;
+	int status = 3;
+	int firstblock;
+	int blockcount = 0;
+	int filesize = 0;
+
+	if ((index = availableEntry()) < 0) {
 		cout << "No more directory entries available." << endl;
 		return;
 	}
-#if DEBUG
-	cout << i << endl;
-#endif
-	if ((j = availableFAT(fsfp, sb)) < 0) {
-		cout << "Not more FAT entires available." << endl;
+	if ((firstblock = availableFAT(fsfp, sb)) < 0) {
+		cout << "No more FAT entires available." << endl;
 		return;
 	}
 #if DEBUG
-	cout << j << endl;
+	cout << "\n----- putFile DEBUG -----" << endl;
+	cout << "Index: " << index << endl;
+	cout << "First Block: " << firstblock << endl;
+	cout << "----- putFile DEBUG END -----\n" << endl;
 #endif
-	updateFDT(sb, i, 3, srcfname);
+
+	char buffer[sb.blockSize()];
+	int next_available = firstblock;
+	int leftover;
+
+	fseek(srcfp, 0, SEEK_SET);
+	fseek(fsfp, sb.blockSize()*firstblock, SEEK_SET);
+	while ((leftover = fread(&buffer, sb.blockSize(), 1, srcfp)) == 1) {
+		/* probably would be nice to have a function to check */
+		/* whether there are free fat entries left before writing. */
+		fwrite(&buffer, sb.blockSize(), 1, fsfp);
+		filesize += sb.blockSize();
+		blockcount++;
+
+		fseek(fsfp, sb.fatStart()*sb.blockSize() + next_available*4, SEEK_CUR);
+		next_available = htonl(findNextAvailableFat(fsfp, &sb, next_available));
+		fwrite(&next_available, 4, 1, fsfp);
+		next_available = htonl(next_available);
+		fseek(fsfp, sb.blockSize()*next_available, SEEK_SET);
+
+	}
+	unsigned int i;
+	char byte;
+	if (leftover < 1) {
+		i = 0;
+		fseek(srcfp, blockcount*sb.blockSize(), SEEK_SET);
+		while (fread(&byte, 1, 1, srcfp)) {
+			fwrite(&buffer[i], 1, 1, fsfp);
+			filesize++;
+			i++;
+		}
+		blockcount++;
+	}
+	unsigned int endoffile = 0xffffffff;
+	fseek(fsfp,sb.fatStart()*sb.blockSize() + next_available*4, SEEK_CUR);
+	fwrite(&endoffile, 4, 1, fsfp);
+
+
+	updateFDT(sb, index, status, firstblock, blockcount, filesize, srcfname);
 	fclose(srcfp);
 }
 
