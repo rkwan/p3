@@ -1,5 +1,6 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstdio>
 #include <netinet/in.h>
 #include "superblock.h"
 #include "direntries.h"
